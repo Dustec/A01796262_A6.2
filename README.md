@@ -33,3 +33,9 @@ python -m pytest --cov=hotel --cov=customer --cov=reservation --cov=base_manager
 flake8 hotel.py customer.py reservation.py menu.py base_manager.py
 pylint hotel.py customer.py reservation.py menu.py base_manager.py
 ```
+
+## Evidence
+
+![TEST COVERAGE](./assets/test_cov_evidence.png)
+
+![PYLINT & FLAKE8](./assets/pylint_flake8_evidence.png)
