@@ -1,0 +1,9 @@
+[
+  {
+    "hotel_id": 1,
+    "name": "KOREGA! Hostel",
+    "location": "Osaka",
+    "rooms": 20,
+    "available_rooms": 19
+  }
+]
