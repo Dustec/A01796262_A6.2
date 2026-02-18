@@ -19,8 +19,9 @@ class Customer(BaseManager):
 
         Returns the created customer dict or None on validation error.
         """
-        if not name or not isinstance(name, str) or not name.strip():
-            print("Error: Customer name must be a non-empty string.")
+        if not self.validate_non_empty_string(
+            name, "Customer name"
+        ):
             return None
         if not email or not isinstance(email, str):
             print("Error: Email must be a non-empty string.")
@@ -29,14 +30,16 @@ class Customer(BaseManager):
             print("Error: Invalid email format.")
             return None
 
-        customers = self._load()
+        customers = self.load()
         new_customer = {
-            "customer_id": self._next_id(customers, "customer_id"),
+            "customer_id": self.next_id(
+                customers, "customer_id"
+            ),
             "name": name.strip(),
             "email": email.strip(),
         }
         customers.append(new_customer)
-        self._save(customers)
+        self.save(customers)
         return new_customer
 
     def delete_customer(self, customer_id):
@@ -44,20 +47,24 @@ class Customer(BaseManager):
 
         Returns True if deleted, False otherwise.
         """
-        customers = self._load()
+        customers = self.load()
         original_len = len(customers)
         customers = [
-            c for c in customers if c["customer_id"] != customer_id
+            c for c in customers
+            if c["customer_id"] != customer_id
         ]
         if len(customers) == original_len:
-            print(f"Error: Customer with id {customer_id} not found.")
+            print(
+                f"Error: Customer with id "
+                f"{customer_id} not found."
+            )
             return False
-        self._save(customers)
+        self.save(customers)
         return True
 
     def display_customer_info(self, customer_id):
         """Return customer dict for the given id, or None."""
-        customers = self._load()
+        customers = self.load()
         for customer in customers:
             if customer["customer_id"] == customer_id:
                 return customer
@@ -70,33 +77,33 @@ class Customer(BaseManager):
         Allowed keys: name, email.
         Returns updated customer dict or None on error.
         """
-        if not self._validate_modify_kwargs(kwargs):
+        if not self._validate_customer_kwargs(kwargs):
             return None
 
-        customers = self._load()
+        customers = self.load()
         for customer in customers:
             if customer["customer_id"] == customer_id:
                 if "name" in kwargs:
                     customer["name"] = kwargs["name"].strip()
                 if "email" in kwargs:
                     customer["email"] = kwargs["email"].strip()
-                self._save(customers)
+                self.save(customers)
                 return customer
 
-        print(f"Error: Customer with id {customer_id} not found.")
+        print(
+            f"Error: Customer with id {customer_id} not found."
+        )
         return None
 
-    def _validate_modify_kwargs(self, kwargs):
+    def _validate_customer_kwargs(self, kwargs):
         """Validate keyword arguments for modify_customer_info."""
         allowed = {"name", "email"}
-        invalid_keys = set(kwargs.keys()) - allowed
-        if invalid_keys:
-            print(f"Error: Invalid fields: {invalid_keys}")
+        if not self.validate_allowed_keys(kwargs, allowed):
             return False
         if "name" in kwargs:
-            val = kwargs["name"]
-            if not val or not isinstance(val, str) or not val.strip():
-                print("Error: Customer name must be a non-empty string.")
+            if not self.validate_non_empty_string(
+                kwargs["name"], "Customer name"
+            ):
                 return False
         if "email" in kwargs:
             val = kwargs["email"]

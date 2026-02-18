@@ -23,10 +23,12 @@ class Reservation(BaseManager):
         Validates that both customer and hotel exist, and that
         a room is available. Returns the reservation dict or None.
         """
-        customer = self.customer_mgr.display_customer_info(customer_id)
+        customer = self.customer_mgr.display_customer_info(
+            customer_id
+        )
         if customer is None:
             print(
-                f"Error: Cannot reserve — customer "
+                f"Error: Cannot reserve - customer "
                 f"{customer_id} not found."
             )
             return None
@@ -34,7 +36,7 @@ class Reservation(BaseManager):
         hotel = self.hotel_mgr.display_hotel_info(hotel_id)
         if hotel is None:
             print(
-                f"Error: Cannot reserve — hotel "
+                f"Error: Cannot reserve - hotel "
                 f"{hotel_id} not found."
             )
             return None
@@ -42,16 +44,16 @@ class Reservation(BaseManager):
         if not self.hotel_mgr.reserve_room(hotel_id):
             return None
 
-        reservations = self._load()
+        reservations = self.load()
         new_reservation = {
-            "reservation_id": self._next_id(
+            "reservation_id": self.next_id(
                 reservations, "reservation_id"
             ),
             "customer_id": customer_id,
             "hotel_id": hotel_id,
         }
         reservations.append(new_reservation)
-        self._save(reservations)
+        self.save(reservations)
         return new_reservation
 
     def cancel_reservation(self, reservation_id):
@@ -59,7 +61,7 @@ class Reservation(BaseManager):
 
         Returns True if cancelled, False otherwise.
         """
-        reservations = self._load()
+        reservations = self.load()
         target = None
         for res in reservations:
             if res["reservation_id"] == reservation_id:
@@ -78,5 +80,5 @@ class Reservation(BaseManager):
             r for r in reservations
             if r["reservation_id"] != reservation_id
         ]
-        self._save(reservations)
+        self.save(reservations)
         return True
